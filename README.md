@@ -1,2 +1,2 @@
 # LansweeperPlatform
-PowerShell module for interacting with the Lansweeper Platform through the Data API
+A PowerShell module for interacting with the Lansweeper Platform through the Data API.
