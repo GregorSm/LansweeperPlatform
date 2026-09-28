@@ -20,4 +20,6 @@ A PowerShell module for interacting with the Lansweeper Platform through the Dat
 4. Start exploring:
    ```PowerShell
    Get-lspAsset
+   Get-Command -Module "LansweeperPlatform"
+   Get-Help -Name "Set-lspAsset" -Full
    ```
