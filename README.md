@@ -13,11 +13,19 @@ A PowerShell module for interacting with the Lansweeper Platform through the Dat
    Connect-lspSite -Name "<your site name>" -Token "..."
    ```
    You only need to enter the token once per session.
-3. Verify that the count matches the number of assets in your Lansweeper site:
+3. Verify that the count matches the number of assets on your Lansweeper site:
    ```PowerShell
    (Get-lspAsset).Count
    ```
-4. Start exploring:
+4. Most cmdlets are documented through examples. Use either:
+   ```PowerShell
+   Get-Help -Name "<cmdlet name>" -Full
+   ```
+   or
+   ```PowerShell
+   Get-Help -Name "<cmdlet name>" -Examples
+   ```
+5. Start exploring the module:
    ```PowerShell
    Get-lspAsset
    Get-Command -Module "LansweeperPlatform"

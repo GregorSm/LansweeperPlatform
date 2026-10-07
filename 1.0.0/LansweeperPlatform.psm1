@@ -5,7 +5,11 @@ function Add-lspRelation
         New Lansweeper Platform Relation
 
     .EXAMPLE
-        PS>Get-lspAsset | Where-Object {$_.Domain -eq "NIL1"} | Add-lspRelation -Name "Depends On" -Child (Get-lspAsset -Name "esx1", "esx2", "esx3")
+        PS>Get-lspAsset | Where-Object {$_.Domain -eq "MYVMWAREVM"} | Add-lspRelation -Name "Depends On" -Child (Get-lspAsset -Name "esx1", "esx2", "esx3")
+
+        This example adds a set of relationships describing virtual machine dependencies on virtualization hosts.
+        First, the virtual machines are selected by a relevant criterion. The custom "Depends On" relationship is then added to all selected virtual machines in bulk.
+        Because three hosts are specified, each virtual machine receives three "Depends On" relationship links.
 #>
 
     [CmdletBinding()]
@@ -64,6 +68,16 @@ mutation
 
 function Connect-lspSite
 {
+<#
+    .SYNOPSIS
+        Connect Lansweeper Platform Site
+
+    .DESCRIPTION
+        This cmdlet establishes a connection to a Lansweeper Platform site and is typically the first cmdlet called in a session.
+        To retrieve a site name, use Get-lspSite first.
+        The Token parameter only needs to be specified once per session.
+#>
+
     [CmdletBinding()]
     param ([Parameter(Mandatory = $True,  ValueFromPipeline = $False)] [string] $Name,
            [Parameter(Mandatory = $False, ValueFromPipeline = $False)] [string] $Token)
@@ -150,10 +164,20 @@ function Get-lspAsset
     .EXAMPLE
         PS>Get-lspAsset -Fields "recognitionInfo.osMetadata.fullName" | Sort-Object -Property "Name" | Format-Table -Property "Key", "Name", "Type", "Domain", "IPAddress", "MAC", "Manufacturer", "Model", "SerialNumber", "StateName", "LastSeen", "OsMetadataFullName" -AutoSize
 
+        This cmdlet retrieves a default set of asset fields corresponding to the columns shown in the default All Assets site view.
+        To retrieve additional fields, use the Fields parameter. The Lansweeper Data API documentation refers to each full field name as a path.
+
+        For more information about determining paths for asset objects, see the Path-building section:
+        https://developer.lansweeper.com/docs/data-api/guides/getting-data#path-building
+
     .EXAMPLE
-        PS>$Zaupnost = @{Name = "Z-zaupnost"; Expression = {($_.CustomFields | Where-Object {$_.Name -eq "Z-Zaupnost"}).Value}}
-        PS>$Razpoložljivost = @{Name = "R-razpoložljivost"; Expression = {($_.CustomFields | Where-Object {$_.Name -eq "R-Razpoložljivost"}).Value}}
-        PS>Get-lspAsset -Name "gregors", "gregors-old" -Fields "assetCustom.building", "assetCustom.department" | Format-Table -Property "Name", "Building", "Department", $Zaupnost, $Razpoložljivost -AutoSize
+        PS>$Confidentiality = @{Name = "C-Confidentiality"; Expression = {($_.CustomFields | Where-Object {$_.Name -eq "C-Confidentiality"}).Value}}
+        PS>$Integrity = @{Name = "I-Integrity"; Expression = {($_.CustomFields | Where-Object {$_.Name -eq "I-Integrity"}).Value}}
+        PS>$Availability = @{Name = "A-Availability"; Expression = {($_.CustomFields | Where-Object {$_.Name -eq "A-Availability"}).Value}}
+        PS>Get-lspAsset -Name "dc1", "dc2" -Fields "assetCustom.building", "assetCustom.department" | Format-Table -Property "Name", "Building", "Department", $Confidentiality, $Integrity, $Availability -AutoSize
+
+        This example assumes that custom fields named C-Confidentiality, I-Integrity, and A-Availability have been added to your Lansweeper site to support the CIA triad.
+        This example retrieves the Building and Department asset fields, along with the C-Confidentiality, I-Integrity, and A-Availability custom fields, for two domain controllers.
 #>
 
     [CmdletBinding()]
@@ -227,8 +251,12 @@ function Get-lspAssetState
     .EXAMPLE
         PS>Get-lspAssetState
 
+        Retrieves all asset categorization states defined on a Lansweeper site.
+
     .EXAMPLE
         PS>Get-lspAssetState -Name "Active", "S*"
+
+        You can specify one or more state names to retrieve. Wildcards are supported.
 #>
 
     [CmdletBinding()]
@@ -271,8 +299,12 @@ function Get-lspAssetType
     .EXAMPLE
         PS>Get-lspAssetType
 
+        Retrieves all asset categorization types defined on a Lansweeper site.
+
     .EXAMPLE
-        PS>Get-lspAssetType -Name "Poslovni proces", "Poslovna aplikacija", "IT*"
+        PS>Get-lspAssetType -Name "Router", "Switch", "Azure *"
+
+        You can specify one or more type names to retrieve. Wildcards are supported.
 #>
 
     [CmdletBinding()]
@@ -315,8 +347,12 @@ function Get-lspCustomField
     .EXAMPLE
         PS>Get-lspCustomField
 
+        Retrieves all asset custom fields defined on a Lansweeper site.
+
     .EXAMPLE
-        PS>Get-lspCustomField -Name "*-*", "*v*"
+        PS>Get-lspCustomField -Name "C-Confidentiality", "*-*"
+
+        You can specify one or more custom field names to retrieve. Wildcards are supported.
 #>
 
     [CmdletBinding()]
@@ -375,11 +411,18 @@ function Get-lspRelation
     .EXAMPLE
         PS>Get-lspRelation
 
+        Retrieves all asset relationship types defined on a Lansweeper site.
+
     .EXAMPLE
         PS>Get-lspAsset | Get-lspRelation
 
+        Retrieves all forward relationship links created between assets.
+        Assets without relationships do not appear in the output.
+
     .EXAMPLE
         PS>Get-lspAsset | Get-lspRelation -Reverse
+
+        Retrieves all reverse relationship links created between assets.
 #>
 
     [CmdletBinding()]
@@ -433,6 +476,16 @@ query
 
 function Get-lspSite
 {
+<#
+    .SYNOPSIS
+        Get Lansweeper Platform Site
+
+    .DESCRIPTION
+        This cmdlet retrieves all site names that your access token has access to.
+        Use the site name when calling the Connect-lspSite cmdlet.
+        The Token parameter only needs to be specified once per session.
+#>
+
     [CmdletBinding()]
     param ([Parameter(Mandatory = $False, ValueFromPipeline = $False)] [string] $Token)
 
@@ -484,15 +537,27 @@ function New-lspAsset
         New Lansweeper Platform Asset
 
     .EXAMPLE
-        PS>New-lspAsset -Name "00 A Simple One"
+        PS>New-lspAsset -Name "As Simple As Possible"
+
+        This example creates an asset using only the Name parameter.
+        It may take up to 30 minutes for the newly created asset to appear on a Lansweeper site.
 
     .EXAMPLE
         PS>$iPhone = (Get-lspAssetType -Name "iPhone").AssetTypeKey
         PS>$Broken = (Get-lspAssetState -Name "Broken").AssetStateKey
-        PS>New-lspAsset -Name "01 Broken iPhone" -Fields "assetBasicInfo.typeKey = $iPhone", "assetCustom.stateKey = $Broken"
+        PS>New-lspAsset -Name "A Broken iPhone" -Fields "assetBasicInfo.typeKey = $iPhone", "assetCustom.stateKey = $Broken"
+
+        This example demonstrates how to set field values during asset creation using the Fields parameter. In the Lansweeper Data API documentation, a full field name is referred to as a path.
+        Use the syntax "path=value", as shown in the example.
+
+        For more information about determining paths for asset objects, see the Path-building section:
+        https://developer.lansweeper.com/docs/data-api/guides/getting-data#path-building
 
     .EXAMPLE
-        PS>New-lspAsset -Name "02 Moj poslovni proces" -Fields "assetBasicInfo.typeKey = $((Get-lspAssetType -Name "Poslovni proces").AssetTypeKey)", "assetCustom.fields.Z-zaupnost = 1", "assetCustom.fields.R-razpoložljivost = 2", "assetCustom.fields.C-celovitost = 3", "assetCustom.fields.A-avtentičnost = 4"
+        PS>New-lspAsset -Name "Payroll Business Process" -Fields "assetBasicInfo.typeKey = $((Get-lspAssetType -Name "Business Process").AssetTypeKey)", "assetCustom.fields.C-Confidentiality = 1", "assetCustom.fields.I-Integrity = 2", "assetCustom.fields.A-Availability = 3"
+
+        This example assumes that an asset type named Business Process and custom fields named C-Confidentiality, I-Integrity, and A-Availability have already been added to your Lansweeper site to support the CIA triad.
+        This example adds an asset representing a business process and assigns CIA ratings to the custom fields. It demonstrates how to set custom field values during asset creation.
 #>
 
     [CmdletBinding()]
@@ -541,6 +606,10 @@ function New-lspCustomField
 <#
     .SYNOPSIS
         New Lansweeper Platform Custom Field
+
+    .DESCRIPTION
+        This cmdlet creates a custom field definition on a Lansweeper site.
+        The examples demonstrate how to create custom fields of all supported types.
 
     .EXAMPLE
         PS>New-lspCustomField -Name "My text" -Type "Text"
@@ -746,10 +815,19 @@ function Set-lspAsset
         Set Lansweeper Platform Asset
 
     .EXAMPLE
-        PS>Get-lspAsset -Name "gregors", "gregors-old" | Set-lspAsset -Fields "assetCustom.building = Tehnološki park 18", "assetCustom.department = Tehnični oddelek", "assetCustom.fields.Z-zaupnost = 1", "assetCustom.fields.R-razpoložljivost = 2"
+        PS>Get-lspAsset -Name "dc1", "dc2" | Set-lspAsset -Fields "assetCustom.building = D", "assetCustom.department = IT", "assetCustom.fields.C-Confidentiality = 1", "assetCustom.fields.I-Integrity = 2", "assetCustom.fields.A-Availability = 3"
+
+        This example assumes that custom fields named C-Confidentiality, I-Integrity, and A-Availability have already been added to your Lansweeper site to support the CIA triad.
+        This example demonstrates how to update predefined fields and custom fields using the Fields parameter. In the Lansweeper Data API documentation, a full field name is referred to as a path.
+        Use the syntax "path=value", as shown in the example.
+
+        For more information about determining paths for asset objects, see the Path-building section:
+        https://developer.lansweeper.com/docs/data-api/guides/getting-data#path-building
 
     .EXAMPLE
-        PS>Get-lspAsset -Name "gregors-old" | Set-lspAsset -Fields "assetCustom.department = ", "assetCustom.fields.Z-zaupnost = "
+        PS>Get-lspAsset -Name "esx1" | Set-lspAsset -Fields "assetCustom.department = ", "assetCustom.fields.A-Availability = "
+
+        This example demonstrates how to clear predefined and custom field values.
 #>
 
     [CmdletBinding()]
