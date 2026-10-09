@@ -867,5 +867,3 @@ mutation
         $Result = Invoke-lspRestMethod -GraphQL $GraphQL.Replace("KEY", $Asset.Key)
     }
 }
-
-Update-FormatData -PrependPath "$PSScriptRoot\LansweeperPlatform.Format.ps1xml"

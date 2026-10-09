@@ -63,7 +63,7 @@ Description = 'Lansweeper Platform via Data API / GraphQL'
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-# FormatsToProcess = @()
+FormatsToProcess = @('LansweeperPlatform.Format.ps1xml')
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
@@ -101,7 +101,7 @@ PrivateData = @{
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/GregorSm/LansweeperPlatform'
 
         # A URL to an icon representing this module.
         # IconUri = ''
