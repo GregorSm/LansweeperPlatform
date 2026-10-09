@@ -1,3 +1,5 @@
+<!-- Version 1.0.2 -->
+
 # LansweeperPlatform
 A PowerShell module for interacting with the Lansweeper Platform through the Data API.
 

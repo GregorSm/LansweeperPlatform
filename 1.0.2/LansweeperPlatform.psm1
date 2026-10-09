@@ -1,3 +1,5 @@
+# Version 1.0.2
+
 function Add-lspRelation
 {
 <#
@@ -866,4 +868,9 @@ mutation
     {
         $Result = Invoke-lspRestMethod -GraphQL $GraphQL.Replace("KEY", $Asset.Key)
     }
+}
+
+if ($PSVersionTable.PSVersion.Major -lt 7)
+{
+    throw "LansweeperPlatform requires PowerShell 7 or later."
 }

@@ -12,10 +12,10 @@
 RootModule = 'LansweeperPlatform.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.0.2'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = @('Core')
 
 # ID used to uniquely identify this module
 GUID = 'fb61ce2c-ea38-4e27-a882-c3fb5efa3b12'
